@@ -16,22 +16,47 @@
       {{ item }}
     </div>
 
-    <p class="font-bold text-black-600 text-lg">
-      Current page : {{ currentPage }}
-    </p>
+    <div class="mb-8">
+      <p class="font-bold text-black-600 text-lg">
+        Current page : {{ currentPage }}
+      </p>
+      <p class="font-bold text-black-600 text-lg">
+        data range: {{ (currentPage - 1) * entryPerPage + 1 }} -
+        {{ currentPage * entryPerPage }}
+      </p>
+      <button
+        class="
+          bg-blue-500
+          hover:bg-blue-700
+          text-white
+          font-bold
+          py-2
+          px-4
+          rounded
+        "
+        @click="currentPage++"
+      >
+        Next page
+      </button>
+    </div>
+
     <button
       class="
-        bg-blue-500
-        hover:bg-blue-700
+        bg-gray-500
+        hover:bg-gray-700
         text-white
         font-bold
         py-2
         px-4
-        rounded
+        rounded-full
+        mx-2
+        my-2
       "
-      @click="currentPage++"
+      v-for="index in totalPages"
+      :key="index"
+      @click="changePage(index)"
     >
-      next page
+      {{ index }}
     </button>
   </div>
 </template>
@@ -9632,6 +9657,21 @@ export default {
         this.currentPage * this.entryPerPage
       );
     },
+    totalPages: function () {
+      return this.dummyApiData.length % 10 === 0
+        ? this.dummyApiData.length / 10
+        : Math.floor(this.dummyApiData.length / 10) + 1;
+    },
+  },
+  methods: {
+    changePage: function (pageNumber) {
+      this.currentPage = pageNumber;
+    },
   },
 };
 </script>
+
+
+12
+
+353
