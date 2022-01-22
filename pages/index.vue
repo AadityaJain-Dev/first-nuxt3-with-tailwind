@@ -1,63 +1,70 @@
 <template>
-  <div class="container ma-auto p-8 break-normal inline-block">
-    <div
-      class="
-        font-bold
-        text-black-600 text-lg
-        m-3
-        p-3
-        bg-gray-300
-        inline-block
-        mb-8
-      "
-      v-for="(item, index) in pageData"
-      :key="index"
-    >
-      {{ item }}
-    </div>
-
-    <div class="mb-8">
-      <p class="font-bold text-black-600 text-lg">
-        Current page : {{ currentPage }}
-      </p>
-      <p class="font-bold text-black-600 text-lg">
-        data range: {{ (currentPage - 1) * entryPerPage + 1 }} -
-        {{ currentPage * entryPerPage }}
-      </p>
-      <button
+  <div class="flex justify-center">
+    <div class="container ma-auto p-8 break-normal inline-block">
+      <div
         class="
-          bg-blue-500
-          hover:bg-blue-700
-          text-white
           font-bold
-          py-2
-          px-4
-          rounded
+          text-black-600 text-lg
+          m-3
+          p-3
+          bg-gray-300
+          inline-block
+          mb-8
         "
-        @click="currentPage++"
+        v-for="(item, index) in showPageData"
+        :key="index"
       >
-        Next page
-      </button>
-    </div>
+        {{ item }}
+      </div>
 
-    <button
-      class="
-        bg-gray-500
-        hover:bg-gray-700
-        text-white
-        font-bold
-        py-2
-        px-4
-        rounded-full
-        mx-2
-        my-2
-      "
-      v-for="index in totalPages"
-      :key="index"
-      @click="changePage(index)"
-    >
-      {{ index }}
-    </button>
+      <div class="flex justify-center">
+        <button
+          class="
+            bg-gray-500
+            hover:bg-gray-700
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded-full
+            mx-2
+            my-2
+            hidden
+            md:inline-flex
+          "
+          v-for="index in totalPages"
+          :key="index"
+          @click="changePage(index)"
+        >
+          {{ index }}
+        </button>
+      </div>
+      <div class="mb-8">
+        <p class="font-bold text-black-600 text-lg">
+          Current page : {{ currentPage }}
+        </p>
+        <p class="font-bold text-black-600 text-lg">
+          data range: {{ (currentPage - 1) * entryPerPage + 1 }} -
+          {{ currentPage * entryPerPage }}
+        </p>
+        <button
+          class="
+            bg-blue-500
+            hover:bg-blue-700
+            text-white
+            font-bold
+            py-2
+            px-4
+            rounded
+            block
+            md:hidden
+          "
+          @click="loadMoreData"
+        >
+          load More
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -66,7 +73,7 @@
 export default {
   data() {
     return {
-      dummyApiData: [
+      fullApiData: [
         "environmental",
         "establishment",
         "extraordinary",
@@ -178,9 +185,21 @@ export default {
       ],
       currentPage: 1,
       entryPerPage: 10,
+      showPageData: [],
     };
   },
   computed: {
+    totalPages: function () {
+      return this.fullApiData.length % 10 === 0
+        ? this.fullApiData.length / 10
+        : Math.floor(this.fullApiData.length / 10) + 1;
+    },
+  },
+  methods: {
+    changePage: function (pageNumber) {
+      this.currentPage = pageNumber;
+      this.pageData();
+    },
     pageData: function () {
       const start =
         this.currentPage === 1
@@ -190,18 +209,20 @@ export default {
         this.currentPage === 1
           ? this.currentPage * this.entryPerPage
           : this.currentPage * this.entryPerPage + 1;
-      return this.dummyApiData.slice(start, end);
+      this.showPageData = this.fullApiData.slice(start, end);
     },
-    totalPages: function () {
-      return this.dummyApiData.length % 10 === 0
-        ? this.dummyApiData.length / 10
-        : Math.floor(this.dummyApiData.length / 10) + 1;
+    loadMoreData: function () {
+      this.currentPage++;
+      const start = 0;
+      const end =
+        this.currentPage === 1
+          ? this.currentPage * this.entryPerPage
+          : this.currentPage * this.entryPerPage + 1;
+      this.showPageData = this.fullApiData.slice(start, end);
     },
   },
-  methods: {
-    changePage: function (pageNumber) {
-      this.currentPage = pageNumber;
-    },
+  mounted() {
+    this.pageData();
   },
 };
 </script>
